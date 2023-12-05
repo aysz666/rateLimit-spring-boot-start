@@ -1,0 +1,6 @@
+storage:
+  mode: "local"
+  coolPrefix: "raleLimit_Cool_Key"
+  countPrefix: "raleLimit_Count_Key"
+  codePrefix: "raleLimit_Code_Key"
+  tokenName: "token"
