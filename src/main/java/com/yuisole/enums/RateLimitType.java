@@ -1,6 +1,8 @@
 package com.yuisole.enums;
 
 /**
+ * 枚举类型，用于定义防刷模式
+ *
  * @author Yuisole
  */
 

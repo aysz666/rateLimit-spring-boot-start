@@ -3,7 +3,6 @@ package com.yuisole.storagemode;
 import cn.hutool.extra.spring.SpringUtil;
 import com.yuisole.config.RateLimitProperties;
 import com.yuisole.storagebase.Storage;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 

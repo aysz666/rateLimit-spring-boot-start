@@ -69,6 +69,7 @@ public interface Storage {
      * @return 返回是否校验成功
      */
     boolean validateCaptcha(String key,String uuid,String text);
+
     /**
      * 设置图片验证码
      * @param key 键

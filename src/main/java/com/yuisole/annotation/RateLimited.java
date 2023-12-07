@@ -6,6 +6,7 @@ import com.yuisole.enums.RateLimitType;
 import java.lang.annotation.*;
 
 /**
+ *
  * @author Yuisole
  */
 @Target(ElementType.METHOD)

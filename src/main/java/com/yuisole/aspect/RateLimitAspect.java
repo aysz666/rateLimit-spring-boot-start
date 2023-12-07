@@ -1,6 +1,7 @@
 package com.yuisole.aspect;
 
 
+import cn.hutool.extra.spring.SpringUtil;
 import com.yuisole.annotation.RateLimited;
 import com.yuisole.config.RateLimitProperties;
 import com.yuisole.enums.RateLimitType;
@@ -16,9 +17,8 @@ import com.yuisole.strategy.impl.TokenRateLimitStrategy;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
@@ -29,7 +29,6 @@ import java.util.Map;
  */
 @Aspect
 public class RateLimitAspect {
-    private HttpServletResponse response;
 
     private final Map<RateLimitType, RateLimitStrategy> STRATEGY_MAP;
 
@@ -67,6 +66,8 @@ public class RateLimitAspect {
      */
     @Around("@annotation(rateLimited)")
     public Object around(ProceedingJoinPoint joinPoint, RateLimited rateLimited) throws Throwable {
+        HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+
         // 获取用户配置的模式
         if(!"redis".equals(properties.getMode()) && !"local".equals(properties.getMode())){
             throw new RateLimitExceededException("Rate limit exceeded for: Invalid rate limit storage mode");
@@ -80,19 +81,19 @@ public class RateLimitAspect {
         }
         Map<String,String> extracted = (Map<String,String>)strategy.extracted(rateLimited, storage, joinPoint);
         if(extracted != null){
-            response.setStatus(555);
-            response.setHeader("uuid",extracted.get("uuid"));
-            response.setHeader("imageCode",extracted.get("imageCode"));
-            throw new RateLimitExceededException("Rate limit exceeded . Please put the uuid and imageCode.");
+            if (response != null) {
+                response.setStatus(555);
+                response.setHeader("uuid",extracted.get("uuid"));
+                response.setHeader("imageCode",extracted.get("imageCode"));
+                throw new RateLimitExceededException("Rate limit exceeded . Please put the uuid and imageCode.");
+            }
+            throw new RateLimitExceededException("Rate limit exceeded for you. Please wait for cooldown.");
         }else{
 
             // 执行方法
             Object proceed = joinPoint.proceed();
             return proceed;
         }
-
-
-
 
     }
 }
