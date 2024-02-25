@@ -19,6 +19,8 @@ ratelimit 是一款配置简单，只需要在api上面打上注解，就能实�
     </dependency>
     
 ```
+注意：springboot版本需要2.7以上才可以实现自动注入，否则注解不生效
+
 使用说明
 1.application.yml的配置
 ```yml
@@ -83,4 +85,17 @@ ratelimit 是一款配置简单，只需要在api上面打上注解，就能实�
     //当访问限制后，会在response的header里面传入uuid，imageCode（base64），直接放在img标签即可显示
     //下次请求header需要带上uuid，以及imageCode的内容，校验成功后会清零cooldown，恢复访问
     @RateLimited(captcha = true)
+```
+7.全局异常拦截
+```java
+    /**
+     * 频率异常
+     * @param e 异常
+     * @return 返回信息
+     */
+    @ExceptionHandler(value = RateLimitExceededException.class)
+    public ApiResult<?> ratelimit(RateLimitExceededException e){
+        log.info("Business exception! the reason is ：{}",e.getMessage());
+        return ApiResult.fail(CommonErrorEnum.LOCK_LIMIT);
+    }
 ```
